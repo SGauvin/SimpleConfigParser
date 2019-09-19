@@ -1,4 +1,5 @@
 #include "SimpleConfigParser.h"
+#include <iomanip>
 
 namespace
 {
@@ -44,23 +45,33 @@ namespace
         }
     }
 
+    struct OutpoutValue
+    {
+        OutpoutValue(std::ofstream& outputfile) : m_outputFile(outputfile) {}
+        void operator()(long value) const {m_outputFile << value;}
+        void operator()(double value) const {m_outputFile << value;}
+        void operator()(bool value) const
+        {
+            switch (value)
+            {
+                case true:
+                    m_outputFile << "true";
+                    break;
+                case false:
+                    m_outputFile << "false";
+                    break;
+            }
+        }
+        void operator()(const std::string& value) const {m_outputFile << "\"" << value << "\"";}
+
+        std::ofstream& m_outputFile;
+    };
+
 } // namespace
 
-Config::Config(const std::string filepath)
+Config::Config()
     : m_values{}
-    , m_inputFile(filepath)
 {
-    parse();
-}
-
-Config::~Config()
-{
-    m_inputFile.close();
-}
-
-Config::operator bool() const
-{
-    return m_inputFile.is_open();
 }
 
 std::optional<const std::variant<long, double, bool, std::string>*> Config::get(const std::string& key) const
@@ -73,12 +84,13 @@ std::optional<const std::variant<long, double, bool, std::string>*> Config::get(
     return {};
 }
 
-void Config::parse()
+bool Config::parse(const std::string& filePath)
 {
-    if (m_inputFile)
+    std::ifstream inputFile(filePath);
+    if (inputFile)
     {
         std::string line;
-        while (std::getline(m_inputFile, line))
+        while (std::getline(inputFile, line))
         {
             std::size_t colonPosition = line.find(":");
             removeComment(line, colonPosition);
@@ -144,5 +156,26 @@ void Config::parse()
             // If nothing was found, default to string
             m_values.emplace(key, value);
         }
+        return true;
     }
+    return false;
+}
+
+bool Config::save(const std::string& filePath) const
+{
+    std::ofstream outputFile(filePath);
+    if (outputFile)
+    {
+        outputFile << std::fixed << std::setprecision(10);
+        OutpoutValue outputFunctions(outputFile);
+
+        for(auto [key, val] : m_values)
+        {
+            outputFile << key << ": ";
+            std::visit(outputFunctions, val);
+            outputFile << '\n';
+        }
+        return true;
+    }
+    return false;
 }

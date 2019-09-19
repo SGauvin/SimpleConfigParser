@@ -8,5 +8,3 @@ key6 : this is also a string # and this comment should be removed
 
 this line will be ignored and so are all empty lines
 #this line will also be ignored
-
-:#this line means a key '' with a string value ""

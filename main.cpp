@@ -3,11 +3,11 @@
 
 int main()
 {
-    Config config("test.txt");   
+    Config config;   
 
     // If the file opened correctly
-    if (config)
-    {        
+    if (config.parse("test.txt"))
+    {
         // If 'key1' exists in config
         if (std::optional<const std::variant<long, double, bool, std::string>*> optionalValue = config.get("key1"))
         {
@@ -73,5 +73,10 @@ int main()
         {
             std::cerr << "Missing value!! There is no key7 in the input file" << std::endl;
         }
+
+        config["test"] = false;
+        config["bonjour"] = 3.0;
+
+        config.save("save2.txt");
     }
 } 
