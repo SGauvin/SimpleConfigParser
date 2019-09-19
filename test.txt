@@ -1,0 +1,12 @@
+key1 : 22 # this is a long
+key2 : 12.34567 # this is a double
+key3 : false # this is a bool
+key4 : true # this also is a bool
+test : "true" # this is a string
+key5 : everything here is ignored "this is a string # and this comment should not be removed" everything here is also ignored
+key6 : this is also a string # and this comment should be removed
+
+this line will be ignored and so are all empty lines
+#this line will also be ignored
+
+:#this line means a key '' with a string value ""
