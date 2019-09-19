@@ -45,9 +45,9 @@ namespace
         }
     }
 
-    struct OutpoutValue
+    struct OutputValue
     {
-        OutpoutValue(std::ofstream& outputfile) : m_outputFile(outputfile) {}
+        OutputValue(std::ofstream& outputfile) : m_outputFile(outputfile) {}
         void operator()(long value) const {m_outputFile << value;}
         void operator()(double value) const {m_outputFile << value;}
         void operator()(bool value) const
@@ -86,6 +86,7 @@ std::optional<const std::variant<long, double, bool, std::string>*> Config::get(
 
 bool Config::parse(const std::string& filePath)
 {
+    m_values.clear();
     std::ifstream inputFile(filePath);
     if (inputFile)
     {
@@ -167,7 +168,7 @@ bool Config::save(const std::string& filePath) const
     if (outputFile)
     {
         outputFile << std::fixed << std::setprecision(10);
-        OutpoutValue outputFunctions(outputFile);
+        OutputValue outputFunctions(outputFile);
 
         for(auto [key, val] : m_values)
         {
